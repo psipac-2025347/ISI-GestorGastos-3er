@@ -31,6 +31,17 @@
         </div>
       </div>
 
+      @if (addTipo() === 'gasto') {
+        <div class="filter-group">
+          <span class="filter-label">Categoria</span>
+          <div class="filter-buttons">
+            @for (cat of categories; track cat.value) {
+              <button class="filter-btn" [class.active]="addCategory() === cat.value" (click)="selectAddCategory(cat.value)">{{ cat.label }}</button>
+            }
+          </div>
+        </div>
+      }
+
       <form class="add-form" (ngSubmit)="submitAdd()">
         <div class="form-group">
           <label for="addAmount">Monto</label>
@@ -40,8 +51,11 @@
           <label for="addDescription">Descripcion (opcional)</label>
           <input id="addDescription" type="text" name="addDescription" [(ngModel)]="addDescription" />
         </div>
-        @if (addModulo() === 'VARIABLE') {
+        @if (addModulo() === 'VARIABLE' && addTipo() === 'ingreso') {
           <p class="hint">Se aplicara un descuento del 5% (IGSS/ISR) sobre el monto ingresado.</p>
+        }
+        @if (addTipo() === 'gasto') {
+          <p class="hint">Se aplicara un IVA del 12% sobre el monto ingresado.</p>
         }
         @if (addError()) {
           <div class="error">{{ addError() }}</div>
@@ -55,7 +69,7 @@
 
   <div class="movements-list">
     @for (mov of preview; track mov.fecha + mov.descripcion + mov.monto) {
-      <div class="movement-item">
+      <div class="movement-item" (click)="showDetail(mov)">
         <div class="movement-icon" [class.up]="mov.tipo === 'ingreso'" [class.down]="mov.tipo === 'gasto'">
           {{ mov.tipo === 'ingreso' ? '↑' : '↓' }}
         </div>
@@ -100,7 +114,7 @@
 
       <div class="movements-list modal-list">
         @for (mov of filtered; track mov.fecha + mov.descripcion + mov.monto) {
-          <div class="movement-item">
+          <div class="movement-item" (click)="showDetail(mov)">
             <div class="movement-icon" [class.up]="mov.tipo === 'ingreso'" [class.down]="mov.tipo === 'gasto'">
               {{ mov.tipo === 'ingreso' ? '↑' : '↓' }}
             </div>
@@ -114,6 +128,22 @@
           <p class="empty-msg">No hay movimientos con esos filtros.</p>
         }
       </div>
+    </div>
+  </div>
+}
+
+@if (detailMovimiento(); as detail) {
+  <div class="movements-modal-overlay" (click)="closeDetail()">
+    <div class="detail-modal" (click)="$event.stopPropagation()">
+      <div class="movements-modal-header">
+        <h3>Detalle del movimiento</h3>
+        <span class="close-btn" (click)="closeDetail()">&times;</span>
+      </div>
+      <p><strong>Descripcion:</strong> {{ detail.descripcion }}</p>
+      <p><strong>Fecha:</strong> {{ detail.fecha }}</p>
+      <p><strong>Monto bruto:</strong> Q {{ detail.bruto.toFixed(2) }}</p>
+      <p><strong>{{ detail.ajusteLabel }}:</strong> Q {{ detail.ajuste.toFixed(2) }}</p>
+      <p><strong>Monto neto:</strong> Q {{ detail.monto.toFixed(2) }}</p>
     </div>
   </div>
 }
