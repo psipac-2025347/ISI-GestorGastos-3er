@@ -2,9 +2,16 @@ import { Component, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IncomeService, IncomeSummary } from '../../../core/services/income.service';
+import { ExpenseService } from '../../../core/services/expense.service';
 import { FinanceSummaryComponent } from '../../../shared/finance-summary/finance-summary.component';
 import { FinanceMovementsComponent } from '../../../shared/finance-movements/finance-movements.component';
-import { mapRecordsToMovimientos, Movimiento } from '../../../shared/movement.util';
+import {
+  mapIncomeRecordsToMovimientos,
+  mapExpenseRecordsToMovimientos,
+  combineMovimientos,
+  Movimiento,
+} from '../../../shared/movement.util';
+import { EXPENSE_CATEGORIES } from '../expense-category';
 
 type IncomeType = 'FIJO' | 'VARIABLE' | 'EXTRA';
 
@@ -19,6 +26,8 @@ export class IncomeModuleComponent implements OnInit {
   @Input({ required: true }) type!: IncomeType;
   @Input({ required: true }) title!: string;
 
+  categories = EXPENSE_CATEGORIES;
+
   saldo = signal(0);
   sueldoFijo = signal(0);
   sueldoVariable = signal(0);
@@ -26,14 +35,26 @@ export class IncomeModuleComponent implements OnInit {
   movimientos = signal<Movimiento[]>([]);
 
   showForm = false;
+  formMode: 'ingreso' | 'gasto' = 'ingreso';
   loading = false;
   errorMessage: string | null = null;
   successMessage: string | null = null;
-  incomeForm: FormGroup;
 
-  constructor(private incomeService: IncomeService, private fb: FormBuilder) {
+  incomeForm: FormGroup;
+  expenseForm: FormGroup;
+
+  constructor(
+    private incomeService: IncomeService,
+    private expenseService: ExpenseService,
+    private fb: FormBuilder
+  ) {
     this.incomeForm = this.fb.group({
       amount: [null, [Validators.required, Validators.min(0.01)]],
+      description: [''],
+    });
+    this.expenseForm = this.fb.group({
+      amount: [null, [Validators.required, Validators.min(0.01)]],
+      category: ['OTROS'],
       description: [''],
     });
   }
@@ -45,26 +66,45 @@ export class IncomeModuleComponent implements OnInit {
   reload(): void {
     this.incomeService.getSummary().subscribe({
       next: (summary: IncomeSummary) => {
-        this.saldo.set(summary[this.type]);
         this.sueldoFijo.set(summary.FIJO);
         this.sueldoVariable.set(summary.VARIABLE);
         this.ingresosExtra.set(summary.EXTRA);
+        this.saldo.set(summary[this.type]);
       },
     });
+
     this.incomeService.list().subscribe({
-      next: (records) => {
-        this.movimientos.set(mapRecordsToMovimientos(records));
+      next: (incomeRecords) => {
+        this.expenseService.list().subscribe({
+          next: (expenseRecords) => {
+            const income = mapIncomeRecordsToMovimientos(incomeRecords).filter((m) => m.modulo === this.type);
+            const expense = mapExpenseRecordsToMovimientos(expenseRecords).filter((m) => m.modulo === this.type);
+            this.movimientos.set(combineMovimientos(income, expense));
+          },
+        });
       },
     });
   }
 
-  toggleForm(): void {
-    this.showForm = !this.showForm;
+  openIngresoForm(): void {
+    this.formMode = 'ingreso';
+    this.showForm = true;
     this.errorMessage = null;
     this.successMessage = null;
   }
 
-  onSubmit(): void {
+  openGastoForm(): void {
+    this.formMode = 'gasto';
+    this.showForm = true;
+    this.errorMessage = null;
+    this.successMessage = null;
+  }
+
+  closeForm(): void {
+    this.showForm = false;
+  }
+
+  onSubmitIncome(): void {
     if (this.incomeForm.invalid) {
       this.incomeForm.markAllAsTouched();
       return;
@@ -87,7 +127,26 @@ export class IncomeModuleComponent implements OnInit {
     });
   }
 
-  onGastosClick(): void {
-    alert('El modulo de Gastos estara disponible proximamente.');
+  onSubmitExpense(): void {
+    if (this.expenseForm.invalid) {
+      this.expenseForm.markAllAsTouched();
+      return;
+    }
+    this.loading = true;
+    this.errorMessage = null;
+    const { amount, category, description } = this.expenseForm.value;
+    this.expenseService.create({ type: this.type, amount, category, description }).subscribe({
+      next: () => {
+        this.loading = false;
+        this.successMessage = 'Gasto registrado correctamente';
+        this.expenseForm.reset({ category: 'OTROS' });
+        this.showForm = false;
+        this.reload();
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = err.error?.message || 'Error al registrar el gasto';
+      },
+    });
   }
 }

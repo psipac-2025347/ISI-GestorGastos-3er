@@ -239,3 +239,24 @@
   max-height: 50vh;
   overflow-y: auto;
 }
+
+.detail-modal {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem 2rem;
+  max-width: 380px;
+  width: 100%;
+}
+
+.detail-modal p {
+  margin: 0.5rem 0;
+  color: #2B2B2B;
+}
+
+.movement-item {
+  cursor: pointer;
+}
+
+.movement-item:hover {
+  background-color: #f5f5f5;
+}
