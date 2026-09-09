@@ -157,9 +157,9 @@
   background-position: center;
   justify-self: start;
 }
-.movement-item:nth-child(3n+1)::before { background-image: url("/images/icons/sueldo-fijo.png"); }
-.movement-item:nth-child(3n+2)::before { background-image: url("/images/icons/Ingreso-Variable.png"); }
-.movement-item:nth-child(3n+3)::before { background-image: url("/images/icons/sueldo-extra.png"); }
+.movement-item.mod-fijo::before { background-image: url("/images/icons/sueldo-fijo.png"); }
+.movement-item.mod-variable::before { background-image: url("/images/icons/Ingreso-Variable.png"); }
+.movement-item.mod-extra::before { background-image: url("/images/icons/sueldo-extra.png"); }
 .movement-icon {
   width: 22px;
   height: 22px;

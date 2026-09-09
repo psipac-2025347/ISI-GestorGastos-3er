@@ -3,7 +3,7 @@
     <span>Movimientos Recientes</span>
     <div class="header-actions">
       <img
-        src="/images/icons/sueldo-fijo.png"
+        src="/images/icons/Expandir.png"
         alt="Expandir"
         class="expand-btn"
         (click)="openModal()"
@@ -69,7 +69,11 @@
 
   <div class="movements-list">
     @for (mov of preview; track mov.fecha + mov.descripcion + mov.monto) {
-      <div class="movement-item" (click)="showDetail(mov)">
+      <div class="movement-item"
+           [class.mod-fijo]="mov.modulo === 'FIJO'"
+           [class.mod-variable]="mov.modulo === 'VARIABLE'"
+           [class.mod-extra]="mov.modulo === 'EXTRA'"
+           (click)="showDetail(mov)">
         <div class="movement-icon" [class.up]="mov.tipo === 'ingreso'" [class.down]="mov.tipo === 'gasto'">
           {{ mov.tipo === 'ingreso' ? '↑' : '↓' }}
         </div>
@@ -114,7 +118,11 @@
 
       <div class="movements-list modal-list">
         @for (mov of filtered; track mov.fecha + mov.descripcion + mov.monto) {
-          <div class="movement-item" (click)="showDetail(mov)">
+          <div class="movement-item"
+               [class.mod-fijo]="mov.modulo === 'FIJO'"
+               [class.mod-variable]="mov.modulo === 'VARIABLE'"
+               [class.mod-extra]="mov.modulo === 'EXTRA'"
+               (click)="showDetail(mov)">
             <div class="movement-icon" [class.up]="mov.tipo === 'ingreso'" [class.down]="mov.tipo === 'gasto'">
               {{ mov.tipo === 'ingreso' ? '↑' : '↓' }}
             </div>
