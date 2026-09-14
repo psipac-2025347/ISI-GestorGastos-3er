@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnChanges, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Input, Output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Movimiento } from '../movement.util';
 import { IncomeService } from '../../core/services/income.service';
@@ -95,6 +95,10 @@ export class FinanceMovementsComponent {
       this.addError.set('Ingresa un monto valido mayor a 0');
       return;
     }
+    if (!this.addDescription || this.addDescription.trim() === '') {
+      this.addError.set('Descripción obligatoria de llenar');
+      return;
+    }
 
     this.addLoading.set(true);
     this.addError.set(null);
@@ -105,12 +109,12 @@ export class FinanceMovementsComponent {
             type: this.addModulo()!,
             category: this.addCategory() as any,
             amount: this.addAmount,
-            description: this.addDescription || undefined,
+            description: this.addDescription,
           })
         : this.incomeService.create({
             type: this.addModulo()!,
             amount: this.addAmount,
-            description: this.addDescription || undefined,
+            description: this.addDescription,
           });
 
     request$.subscribe({

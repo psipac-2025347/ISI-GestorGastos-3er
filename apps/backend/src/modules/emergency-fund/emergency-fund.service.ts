@@ -1,10 +1,39 @@
 import { prisma } from '../../config/database.config';
 import { CreateFundMovementDto } from './emergency-fund.dto';
+import { getModuleBalance, getFundBalance } from '../../utils/balance.util';
 
 const IVA_RATE = 0.12;
 
 export class EmergencyFundService {
   async create(userId: string, data: CreateFundMovementDto) {
+    // Validaciones ANTES de la transacción
+    if (data.movementType === 'APORTE') {
+      const moduleBalance = await getModuleBalance(userId, data.sourceType!);
+      const gross = data.amount;
+      const tax = gross * IVA_RATE;
+      const net = gross + tax;
+      if (moduleBalance - net < 0) {
+        throw { status: 400, message: 'Saldo insuficiente en este modulo' };
+      }
+    }
+
+    if (data.movementType === 'RETIRO') {
+      const fundBalance = await getFundBalance(userId);
+      if (fundBalance - data.amount < 0) {
+        throw { status: 400, message: 'Saldo insuficiente en el fondo de emergencia' };
+      }
+    }
+
+    if (data.movementType === 'GASTO_DIRECTO') {
+      const fundBalance = await getFundBalance(userId);
+      const gross = data.amount;
+      const tax = gross * IVA_RATE;
+      const net = gross + tax;
+      if (fundBalance - net < 0) {
+        throw { status: 400, message: 'Saldo insuficiente en el fondo de emergencia' };
+      }
+    }
+
     return prisma.$transaction(async (tx) => {
       let grossAmount = data.amount;
       let tax = 0;

@@ -8,6 +8,7 @@ import {
 } from '../../../core/services/emergency-fund.service';
 
 type MovementMode = 'APORTE' | 'RETIRO' | 'GASTO_DIRECTO';
+type FundMovementType = 'APORTE' | 'RETIRO' | 'GASTO_DIRECTO';
 
 const SOURCE_LABELS: Record<string, string> = {
   FIJO: 'Sueldo Fijo',
@@ -40,7 +41,7 @@ export class FondoEmergenciaComponent implements OnInit {
     this.form = this.fb.group({
       sourceType: [''],
       amount: [null, [Validators.required, Validators.min(0.01)]],
-      description: [''],
+      description: ['', [Validators.required]],
     });
   }
 
@@ -78,6 +79,10 @@ export class FondoEmergenciaComponent implements OnInit {
       this.errorMessage = 'Selecciona un modulo';
       return;
     }
+    if (!this.form.value.description || this.form.value.description.trim() === '') {
+      this.errorMessage = 'Descripción obligatoria de llenar';
+      return;
+    }
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -91,7 +96,7 @@ export class FondoEmergenciaComponent implements OnInit {
       movementType: this.mode,
       sourceType: this.requiresSource ? (sourceType as SourceType) : undefined,
       amount,
-      description: description || undefined,
+      description: description,
     }).subscribe({
       next: () => {
         this.loading = false;
@@ -115,5 +120,3 @@ export class FondoEmergenciaComponent implements OnInit {
     return new Date(dateStr).toLocaleDateString('es-GT', { day: '2-digit', month: 'short', year: 'numeric' });
   }
 }
-
-type FundMovementType = 'APORTE' | 'RETIRO' | 'GASTO_DIRECTO';

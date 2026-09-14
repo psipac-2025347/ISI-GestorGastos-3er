@@ -1,5 +1,6 @@
 import { prisma } from '../../config/database.config';
 import { CreateExpenseDto } from './expense.dto';
+import { getModuleBalance } from '../../utils/balance.util';
 
 const IVA_RATE = 0.12;
 
@@ -8,6 +9,12 @@ export class ExpenseService {
     const gross = data.amount;
     const tax = gross * IVA_RATE;
     const net = gross + tax;
+
+    // Validar saldo suficiente antes de crear
+    const currentBalance = await getModuleBalance(userId, data.type);
+    if (currentBalance - net < 0) {
+      throw { status: 400, message: 'Saldo insuficiente en este modulo' };
+    }
 
     return prisma.expense.create({
       data: {

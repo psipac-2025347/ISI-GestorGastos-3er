@@ -48,7 +48,7 @@
           <input id="addAmount" type="number" step="0.01" name="addAmount" [(ngModel)]="addAmount" />
         </div>
         <div class="form-group">
-          <label for="addDescription">Descripcion (opcional)</label>
+          <label for="addDescription">Descripcion</label>
           <input id="addDescription" type="text" name="addDescription" [(ngModel)]="addDescription" />
         </div>
         @if (addModulo() === 'VARIABLE' && addTipo() === 'ingreso') {
@@ -80,7 +80,7 @@
         <span class="movement-desc">{{ mov.descripcion }}</span>
         <span class="movement-date">{{ mov.fecha }}</span>
         <span class="movement-amount" [class.positive]="mov.tipo === 'ingreso'" [class.negative]="mov.tipo === 'gasto'">
-          {{ mov.tipo === 'ingreso' ? '+' : '-' }} Q {{ mov.monto.toFixed(2) }}
+          Q {{ mov.monto.toFixed(2) }}
         </span>
       </div>
     } @empty {
@@ -129,7 +129,7 @@
             <span class="movement-desc">{{ mov.descripcion }}</span>
             <span class="movement-date">{{ mov.fecha }}</span>
             <span class="movement-amount" [class.positive]="mov.tipo === 'ingreso'" [class.negative]="mov.tipo === 'gasto'">
-              {{ mov.tipo === 'ingreso' ? '+' : '-' }} Q {{ mov.monto.toFixed(2) }}
+            Q {{ mov.monto.toFixed(2) }}
             </span>
           </div>
         } @empty {
