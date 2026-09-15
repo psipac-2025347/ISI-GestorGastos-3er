@@ -1,9 +1,16 @@
 <div class="login-page">
   <div class="login-left">
-<img src="images/ISI-removebg-preview.png" alt="Logo ISI" />
+    <img src="images/ISI-removebg-preview.png" alt="Logo ISI" />
 
     <div class="login-form-wrapper">
       <h2>Iniciar sesión</h2>
+
+      <div id="google-btn" class="google-btn-container"></div>
+
+      <div class="divider">
+        <span>o</span>
+      </div>
+
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <div class="form-group">
           <label for="email">Email Address</label>

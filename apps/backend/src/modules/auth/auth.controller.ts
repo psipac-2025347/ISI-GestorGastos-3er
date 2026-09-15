@@ -1,5 +1,5 @@
 import { AuthService } from './auth.service';
-import { Response } from 'express';
+import { NextFunction, Response } from 'express';
 import { AuthRequest } from '../../middlewares/auth.middleware';
 
 const authService = new AuthService();
@@ -28,6 +28,15 @@ export class AuthController {
 async refresh(req: AuthRequest, res: Response, next: NextFunction) {
   try {
     const result = await authService.refresh(req.user!.sub, req.user!.email, req.user!.role);
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+}
+async google(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { idToken } = req.body;
+    const result = await authService.loginWithGoogle(idToken);
     res.status(200).json(result);
   } catch (error) {
     next(error);

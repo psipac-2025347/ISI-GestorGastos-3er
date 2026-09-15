@@ -12,16 +12,18 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  incomes   Income[]
-  expenses  Expense[]
-  emergencyFundMovements  EmergencyFundMovement[]
+  id         String    @id @default(uuid())
+  email      String    @unique
+  password   String?
+  name       String
+  role       Role      @default(USER)
+  googleId   String?   @unique
+  picture    String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  incomes    Income[]
+  expenses   Expense[]
+  emergencyFundMovements EmergencyFundMovement[]
   @@map("users")
 }
 enum IncomeType {

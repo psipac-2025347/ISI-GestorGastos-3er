@@ -11,4 +11,5 @@ router.post('/register', validate(registerSchema), authController.register.bind(
 router.post('/login', validate(loginSchema), authController.login.bind(authController));
 router.get('/me', authMiddleware, authController.me.bind(authController));
 router.post('/refresh', authMiddleware, authController.refresh.bind(authController));
+router.post('/google', authController.google.bind(authController));
 export default router;
