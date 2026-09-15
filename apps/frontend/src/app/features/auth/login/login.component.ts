@@ -6,6 +6,8 @@ import { AuthService } from '../../../core/services/auth.service';
 import { GoogleAuthService } from '../../../core/services/google-auth.service';
 import { TokenService } from '../../../core/services/token.service';
 
+declare const google: any;
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -32,8 +34,16 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.googleAuthService.initialize((idToken) => this.handleGoogleLogin(idToken));
-    this.googleAuthService.renderButton('google-btn');
+    this.waitForGoogle();
+  }
+
+  private waitForGoogle(): void {
+    if (typeof google !== 'undefined' && google.accounts) {
+      this.googleAuthService.initialize((idToken) => this.handleGoogleLogin(idToken));
+      this.googleAuthService.renderButton('google-btn');
+    } else {
+      setTimeout(() => this.waitForGoogle(), 100);
+    }
   }
 
   onSubmit(): void {

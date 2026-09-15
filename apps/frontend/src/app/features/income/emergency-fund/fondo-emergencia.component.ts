@@ -27,11 +27,11 @@ export class FondoEmergenciaComponent implements OnInit {
   balance = signal(0);
   movements = signal<FundMovementRecord[]>([]);
 
-  showForm = false;
-  mode: MovementMode = 'APORTE';
-  loading = false;
-  errorMessage: string | null = null;
-  successMessage: string | null = null;
+  showForm = signal(false);
+  mode = signal<MovementMode>('APORTE');
+  loading = signal(false);
+  errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
 
   sourceLabels = SOURCE_LABELS;
 
@@ -51,36 +51,44 @@ export class FondoEmergenciaComponent implements OnInit {
 
   reload(): void {
     this.fundService.getBalance().subscribe({
-      next: (res) => this.balance.set(res.balance),
+      next: (res) => this.balance.set(Number(res.balance)),
     });
     this.fundService.list().subscribe({
-      next: (records) => this.movements.set(records),
+      next: (records) => {
+        const normalized = records.map((r) => ({
+          ...r,
+          grossAmount: Number(r.grossAmount),
+          tax: Number(r.tax),
+          netAmount: Number(r.netAmount),
+        }));
+        this.movements.set(normalized);
+      },
     });
   }
 
+  get requiresSource(): boolean {
+    return this.mode() === 'APORTE' || this.mode() === 'RETIRO';
+  }
+
   openForm(mode: MovementMode): void {
-    this.mode = mode;
-    this.showForm = true;
-    this.errorMessage = null;
-    this.successMessage = null;
+    this.mode.set(mode);
+    this.showForm.set(true);
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
     this.form.reset();
   }
 
   closeForm(): void {
-    this.showForm = false;
-  }
-
-  get requiresSource(): boolean {
-    return this.mode === 'APORTE' || this.mode === 'RETIRO';
+    this.showForm.set(false);
   }
 
   onSubmit(): void {
     if (this.requiresSource && !this.form.value.sourceType) {
-      this.errorMessage = 'Selecciona un modulo';
+      this.errorMessage.set('Selecciona un modulo');
       return;
     }
     if (!this.form.value.description || this.form.value.description.trim() === '') {
-      this.errorMessage = 'Descripción obligatoria de llenar';
+      this.errorMessage.set('Descripcion obligatoria de llenar');
       return;
     }
     if (this.form.invalid) {
@@ -88,26 +96,26 @@ export class FondoEmergenciaComponent implements OnInit {
       return;
     }
 
-    this.loading = true;
-    this.errorMessage = null;
+    this.loading.set(true);
+    this.errorMessage.set(null);
     const { sourceType, amount, description } = this.form.value;
 
     this.fundService.create({
-      movementType: this.mode,
+      movementType: this.mode(),
       sourceType: this.requiresSource ? (sourceType as SourceType) : undefined,
       amount,
-      description: description,
+      description,
     }).subscribe({
       next: () => {
-        this.loading = false;
-        this.successMessage = 'Movimiento registrado correctamente';
+        this.loading.set(false);
+        this.successMessage.set('Movimiento registrado correctamente');
         this.form.reset();
-        this.showForm = false;
+        this.showForm.set(false);
         this.reload();
       },
       error: (err) => {
-        this.loading = false;
-        this.errorMessage = err.error?.message || 'Error al registrar el movimiento';
+        this.loading.set(false);
+        this.errorMessage.set(err.error?.message || 'Error al registrar el movimiento');
       },
     });
   }

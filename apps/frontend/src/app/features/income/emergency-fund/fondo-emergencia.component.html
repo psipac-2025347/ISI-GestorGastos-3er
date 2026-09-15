@@ -13,11 +13,11 @@
     <button class="btn-gasto" (click)="openForm('GASTO_DIRECTO')">Gasto directo</button>
   </div>
 
-  @if (showForm) {
+  @if (showForm()) {
     <form class="fund-form" [formGroup]="form" (ngSubmit)="onSubmit()">
       @if (requiresSource) {
         <div class="form-group">
-          <label for="sourceType">{{ mode === 'APORTE' ? 'Modulo de origen' : 'Modulo destino' }}</label>
+          <label for="sourceType">{{ mode() === 'APORTE' ? 'Modulo de origen' : 'Modulo destino' }}</label>
           <select id="sourceType" formControlName="sourceType">
             <option value="">Selecciona un modulo</option>
             <option value="FIJO">Sueldo Fijo</option>
@@ -43,25 +43,25 @@
         }
       </div>
 
-      @if (mode === 'APORTE' || mode === 'GASTO_DIRECTO') {
+      @if (mode() === 'APORTE' || mode() === 'GASTO_DIRECTO') {
         <p class="hint">Se aplicara un IVA del 12% sobre el monto ingresado.</p>
       }
-      @if (mode === 'RETIRO') {
+      @if (mode() === 'RETIRO') {
         <p class="hint">El retiro no lleva ningun descuento ni impuesto.</p>
       }
 
-      @if (errorMessage) {
-        <div class="error">{{ errorMessage }}</div>
+      @if (errorMessage()) {
+        <div class="error">{{ errorMessage() }}</div>
       }
 
-      <button type="submit" class="btn-submit" [disabled]="loading">
-        {{ loading ? 'Guardando...' : 'Registrar' }}
+      <button type="submit" class="btn-submit" [disabled]="loading()">
+        {{ loading() ? 'Guardando...' : 'Registrar' }}
       </button>
     </form>
   }
 
-  @if (successMessage) {
-    <p class="success">{{ successMessage }}</p>
+  @if (successMessage()) {
+    <p class="success">{{ successMessage() }}</p>
   }
 
   <div class="movements-panel">
