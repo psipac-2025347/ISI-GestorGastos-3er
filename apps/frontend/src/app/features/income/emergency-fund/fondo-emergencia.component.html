@@ -1,0 +1,90 @@
+<div class="fund-container">
+  <h2>Fondo de Emergencia</h2>
+
+  <div class="balance-card">
+    <p class="balance-label">Saldo del Fondo</p>
+    <p class="balance-value">Q {{ balance().toFixed(2) }}</p>
+    <p class="balance-status">Disponible</p>
+  </div>
+
+  <div class="action-buttons">
+    <button class="btn-aporte" (click)="openForm('APORTE')">Aportar</button>
+    <button class="btn-retiro" (click)="openForm('RETIRO')">Retirar</button>
+    <button class="btn-gasto" (click)="openForm('GASTO_DIRECTO')">Gasto directo</button>
+  </div>
+
+  @if (showForm()) {
+    <form class="fund-form" [formGroup]="form" (ngSubmit)="onSubmit()">
+      @if (requiresSource) {
+        <div class="form-group">
+          <label for="sourceType">{{ mode() === 'APORTE' ? 'Modulo de origen' : 'Modulo destino' }}</label>
+          <select id="sourceType" formControlName="sourceType">
+            <option value="">Selecciona un modulo</option>
+            <option value="FIJO">Sueldo Fijo</option>
+            <option value="VARIABLE">Sueldo Variable</option>
+            <option value="EXTRA">Ingreso Extra</option>
+          </select>
+        </div>
+      }
+
+      <div class="form-group">
+        <label for="amount">Monto</label>
+        <input id="amount" type="number" step="0.01" formControlName="amount" />
+        @if (form.get('amount')?.touched && form.get('amount')?.invalid) {
+          <span class="error">Ingresa un monto valido mayor a 0</span>
+        }
+      </div>
+
+      <div class="form-group">
+        <label for="description">Descripcion</label>
+        <input id="description" type="text" formControlName="description" />
+        @if (form.get('description')?.touched && form.get('description')?.invalid) {
+          <span class="error">La descripcion es obligatoria</span>
+        }
+      </div>
+
+      @if (mode() === 'APORTE' || mode() === 'GASTO_DIRECTO') {
+        <p class="hint">Se aplicara un IVA del 12% sobre el monto ingresado.</p>
+      }
+      @if (mode() === 'RETIRO') {
+        <p class="hint">El retiro no lleva ningun descuento ni impuesto.</p>
+      }
+
+      @if (errorMessage()) {
+        <div class="error">{{ errorMessage() }}</div>
+      }
+
+      <button type="submit" class="btn-submit" [disabled]="loading()">
+        {{ loading() ? 'Guardando...' : 'Registrar' }}
+      </button>
+    </form>
+  }
+
+  @if (successMessage()) {
+    <p class="success">{{ successMessage() }}</p>
+  }
+
+  <div class="movements-panel">
+    <div class="movements-header">
+      <span>Movimientos del Fondo</span>
+    </div>
+    <div class="movements-list">
+      @for (mov of movements(); track mov.id) {
+        <div class="movement-item">
+          <span class="movement-desc">
+            {{ movementLabel(mov.movementType) }}
+            @if (mov.sourceType) {
+              <small>({{ sourceLabels[mov.sourceType] }})</small>
+            }
+          </span>
+          <span class="movement-date">{{ formatFecha(mov.date) }}</span>
+          <span class="movement-amount" [class.positive]="mov.movementType === 'APORTE'" [class.negative]="mov.movementType !== 'APORTE'">
+          Q {{ mov.netAmount.toFixed(2) }}
+          </span>
+        </div>
+      } @empty {
+        <p class="empty-msg">Aun no hay movimientos en el fondo.</p>
+      }
+    </div>
+  </div>
+</div>

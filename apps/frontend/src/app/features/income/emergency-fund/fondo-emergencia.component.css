@@ -1,0 +1,170 @@
+.fund-container {
+  background-color: #ffffff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  max-width: 600px;
+  margin: 1rem auto;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+h2 {
+  color: #2E7D32;
+  margin-top: 0;
+}
+
+.balance-card {
+  background-color: #F5F5F5;
+  border-radius: 10px;
+  padding: 1.5rem;
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.balance-label {
+  font-weight: 700;
+  color: #2B2B2B;
+  margin: 0;
+}
+
+.balance-value {
+  font-size: 2rem;
+  font-weight: 800;
+  color: #2E7D32;
+  margin: 0.5rem 0;
+}
+
+.balance-status {
+  font-size: 0.85rem;
+  color: #4CAF50;
+  margin: 0;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.btn-aporte, .btn-retiro, .btn-gasto {
+  flex: 1;
+  padding: 0.7rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.btn-aporte {
+  background-color: #E8F5E9;
+  color: #2E7D32;
+}
+
+.btn-retiro {
+  background-color: #FFF3E0;
+  color: #E65100;
+}
+
+.btn-gasto {
+  background-color: #FFEBEE;
+  color: #B71C1C;
+}
+
+.fund-form {
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+  margin-bottom: 1rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+}
+
+label {
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+  color: #2B2B2B;
+}
+
+input, select {
+  padding: 0.6rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.hint {
+  font-size: 0.85rem;
+  color: #9E9E9E;
+  margin-bottom: 1rem;
+}
+
+.error {
+  color: #B71C1C;
+  font-size: 0.85rem;
+  margin-top: 0.25rem;
+}
+
+.success {
+  color: #2E7D32;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.btn-submit {
+  padding: 0.7rem;
+  background-color: #2E7D32;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+}
+
+.btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.movements-panel {
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+
+.movements-header {
+  font-weight: 700;
+  color: #2B2B2B;
+  margin-bottom: 0.8rem;
+}
+
+.movement-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.movement-desc small {
+  color: #9E9E9E;
+  font-weight: 400;
+}
+
+.movement-date {
+  color: #9E9E9E;
+  font-size: 0.85rem;
+}
+
+.movement-amount {
+  font-weight: 700;
+}
+
+.movement-amount.positive { color: #2E7D32; }
+.movement-amount.negative { color: #B71C1C; }
+
+.empty-msg {
+  text-align: center;
+  color: #9E9E9E;
+  padding: 1rem 0;
+}

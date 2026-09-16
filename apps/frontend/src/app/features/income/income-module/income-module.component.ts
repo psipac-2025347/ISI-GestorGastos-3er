@@ -36,9 +36,11 @@ export class IncomeModuleComponent implements OnInit {
 
   showForm = false;
   formMode: 'ingreso' | 'gasto' = 'ingreso';
-  loading = false;
-  errorMessage: string | null = null;
-  successMessage: string | null = null;
+  
+  // CORREGIDO: Convertidos a signal para que la vista se actualice en Zoneless
+  loading = signal(false);
+  errorMessage = signal<string | null>(null);
+  successMessage = signal<string | null>(null);
 
   incomeForm: FormGroup;
   expenseForm: FormGroup;
@@ -50,12 +52,12 @@ export class IncomeModuleComponent implements OnInit {
   ) {
     this.incomeForm = this.fb.group({
       amount: [null, [Validators.required, Validators.min(0.01)]],
-      description: [''],
+      description: ['', [Validators.required]],
     });
     this.expenseForm = this.fb.group({
       amount: [null, [Validators.required, Validators.min(0.01)]],
       category: ['OTROS'],
-      description: [''],
+      description: ['', [Validators.required]],
     });
   }
 
@@ -81,6 +83,10 @@ export class IncomeModuleComponent implements OnInit {
             const expense = mapExpenseRecordsToMovimientos(expenseRecords).filter((m) => m.modulo === this.type);
             this.movimientos.set(combineMovimientos(income, expense));
           },
+          error: () => {
+            const income = mapIncomeRecordsToMovimientos(incomeRecords).filter((m) => m.modulo === this.type);
+            this.movimientos.set(income);
+          }
         });
       },
     });
@@ -89,63 +95,75 @@ export class IncomeModuleComponent implements OnInit {
   openIngresoForm(): void {
     this.formMode = 'ingreso';
     this.showForm = true;
-    this.errorMessage = null;
-    this.successMessage = null;
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
   }
 
   openGastoForm(): void {
     this.formMode = 'gasto';
     this.showForm = true;
-    this.errorMessage = null;
-    this.successMessage = null;
+    this.errorMessage.set(null);
+    this.successMessage.set(null);
   }
 
   closeForm(): void {
     this.showForm = false;
+    this.errorMessage.set(null);
   }
 
   onSubmitIncome(): void {
+    if (!this.incomeForm.value.description || this.incomeForm.value.description.trim() === '') {
+      this.errorMessage.set('Descripción obligatoria de llenar');
+      return;
+    }
     if (this.incomeForm.invalid) {
       this.incomeForm.markAllAsTouched();
       return;
     }
-    this.loading = true;
-    this.errorMessage = null;
+    this.loading.set(true);
+    this.errorMessage.set(null);
     const { amount, description } = this.incomeForm.value;
+    
     this.incomeService.create({ type: this.type, amount, description }).subscribe({
       next: () => {
-        this.loading = false;
-        this.successMessage = 'Ingreso registrado correctamente';
+        this.loading.set(false);
+        this.successMessage.set('Ingreso registrado correctamente');
         this.incomeForm.reset();
         this.showForm = false;
         this.reload();
       },
       error: (err) => {
-        this.loading = false;
-        this.errorMessage = err.error?.message || 'Error al registrar el ingreso';
+        this.loading.set(false);
+        this.errorMessage.set(err.error?.message || 'Error al registrar el ingreso');
       },
     });
   }
 
   onSubmitExpense(): void {
+    if (!this.expenseForm.value.description || this.expenseForm.value.description.trim() === '') {
+      this.errorMessage.set('Descripción obligatoria de llenar');
+      return;
+    }
     if (this.expenseForm.invalid) {
       this.expenseForm.markAllAsTouched();
       return;
     }
-    this.loading = true;
-    this.errorMessage = null;
+    this.loading.set(true);
+    this.errorMessage.set(null);
     const { amount, category, description } = this.expenseForm.value;
+    
     this.expenseService.create({ type: this.type, amount, category, description }).subscribe({
       next: () => {
-        this.loading = false;
-        this.successMessage = 'Gasto registrado correctamente';
+        this.loading.set(false);
+        this.successMessage.set('Gasto registrado correctamente');
         this.expenseForm.reset({ category: 'OTROS' });
         this.showForm = false;
         this.reload();
       },
       error: (err) => {
-        this.loading = false;
-        this.errorMessage = err.error?.message || 'Error al registrar el gasto';
+        this.loading.set(false);
+        // Aquí se captura "Saldo insuficiente en este modulo"
+        this.errorMessage.set(err.error?.message || 'Error al registrar el gasto');
       },
     });
   }

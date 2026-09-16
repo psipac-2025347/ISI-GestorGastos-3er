@@ -48,7 +48,7 @@
           <input id="addAmount" type="number" step="0.01" name="addAmount" [(ngModel)]="addAmount" />
         </div>
         <div class="form-group">
-          <label for="addDescription">Descripcion (opcional)</label>
+          <label for="addDescription">Descripcion</label>
           <input id="addDescription" type="text" name="addDescription" [(ngModel)]="addDescription" />
         </div>
         @if (addModulo() === 'VARIABLE' && addTipo() === 'ingreso') {
@@ -69,14 +69,18 @@
 
   <div class="movements-list">
     @for (mov of preview; track mov.fecha + mov.descripcion + mov.monto) {
-      <div class="movement-item" (click)="showDetail(mov)">
+      <div class="movement-item"
+           [class.mod-fijo]="mov.modulo === 'FIJO'"
+           [class.mod-variable]="mov.modulo === 'VARIABLE'"
+           [class.mod-extra]="mov.modulo === 'EXTRA'"
+           (click)="showDetail(mov)">
         <div class="movement-icon" [class.up]="mov.tipo === 'ingreso'" [class.down]="mov.tipo === 'gasto'">
           {{ mov.tipo === 'ingreso' ? '↑' : '↓' }}
         </div>
         <span class="movement-desc">{{ mov.descripcion }}</span>
         <span class="movement-date">{{ mov.fecha }}</span>
         <span class="movement-amount" [class.positive]="mov.tipo === 'ingreso'" [class.negative]="mov.tipo === 'gasto'">
-          {{ mov.tipo === 'ingreso' ? '+' : '-' }} Q {{ mov.monto.toFixed(2) }}
+          Q {{ mov.monto.toFixed(2) }}
         </span>
       </div>
     } @empty {
@@ -114,14 +118,18 @@
 
       <div class="movements-list modal-list">
         @for (mov of filtered; track mov.fecha + mov.descripcion + mov.monto) {
-          <div class="movement-item" (click)="showDetail(mov)">
+          <div class="movement-item"
+               [class.mod-fijo]="mov.modulo === 'FIJO'"
+               [class.mod-variable]="mov.modulo === 'VARIABLE'"
+               [class.mod-extra]="mov.modulo === 'EXTRA'"
+               (click)="showDetail(mov)">
             <div class="movement-icon" [class.up]="mov.tipo === 'ingreso'" [class.down]="mov.tipo === 'gasto'">
               {{ mov.tipo === 'ingreso' ? '↑' : '↓' }}
             </div>
             <span class="movement-desc">{{ mov.descripcion }}</span>
             <span class="movement-date">{{ mov.fecha }}</span>
             <span class="movement-amount" [class.positive]="mov.tipo === 'ingreso'" [class.negative]="mov.tipo === 'gasto'">
-              {{ mov.tipo === 'ingreso' ? '+' : '-' }} Q {{ mov.monto.toFixed(2) }}
+            Q {{ mov.monto.toFixed(2) }}
             </span>
           </div>
         } @empty {
