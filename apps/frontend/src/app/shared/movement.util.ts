@@ -4,6 +4,7 @@ import { ExpenseRecord } from '../core/services/expense.service';
 export interface Movimiento {
   descripcion: string;
   fecha: string;
+  fechaSort: number; // Agregado: timestamp para ordenamiento cronológico preciso
   monto: number;
   tipo: 'ingreso' | 'gasto';
   modulo: 'FIJO' | 'VARIABLE' | 'EXTRA';
@@ -26,14 +27,15 @@ function formatFecha(dateStr: string): string {
 
 export function mapIncomeRecordsToMovimientos(records: IncomeRecord[]): Movimiento[] {
   return records.map((r) => ({
-    descripcion: TYPE_LABELS[r.type] || r.type,
+    descripcion: r.description || TYPE_LABELS[r.type] || r.type,
     fecha: formatFecha(r.date),
+    fechaSort: new Date(r.date).getTime(), // Guardamos el timestamp real
     monto: Number(r.netAmount),
     tipo: 'ingreso' as const,
     modulo: r.type,
     bruto: Number(r.grossAmount),
     ajuste: Number(r.deduction),
-    ajusteLabel: 'Descuento (5% IGSS/ISR)',
+    ajusteLabel: r.deduction > 0 ? 'Descuento (5% IGSS/ISR)' : 'Sin descuento',
   }));
 }
 
@@ -41,6 +43,7 @@ export function mapExpenseRecordsToMovimientos(records: ExpenseRecord[]): Movimi
   return records.map((r) => ({
     descripcion: r.description || r.category,
     fecha: formatFecha(r.date),
+    fechaSort: new Date(r.date).getTime(), // Guardamos el timestamp real
     monto: Number(r.netAmount),
     tipo: 'gasto' as const,
     modulo: r.type,
@@ -52,9 +55,10 @@ export function mapExpenseRecordsToMovimientos(records: ExpenseRecord[]): Movimi
 
 export function combineMovimientos(income: Movimiento[], expense: Movimiento[]): Movimiento[] {
   return [...income, ...expense].sort((a, b) => {
-    return new Date(b.fecha).getTime() - new Date(a.fecha).getTime();
+    // Orden descendente: el timestamp más grande (más reciente) va primero
+    return b.fechaSort - a.fechaSort;
   });
 }
 
-// Alias retrocompatible con el nombre anterior, por si algún componente aún lo usa
+// Alias retrocompatible
 export const mapRecordsToMovimientos = mapIncomeRecordsToMovimientos;

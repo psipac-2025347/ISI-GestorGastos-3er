@@ -4,6 +4,7 @@ import authRoutes from './modules/auth/auth.routes';
 import { errorMiddleware } from './middlewares/error.middleware';
 import incomeRoutes from './modules/income/income.routes';
 import expenseRoutes from './modules/expense/expense.routes';
+import emergencyFundRoutes from './modules/emergency-fund/emergency-fund.routes';
 
 const app = express();
 
@@ -13,6 +14,7 @@ app.use(express.json());
 app.use('/api/auth', authRoutes);
 app.use('/api/income', incomeRoutes);
 app.use('/api/expense', expenseRoutes);
+app.use('/api/emergency-fund', emergencyFundRoutes);
 
 app.use(errorMiddleware);
 

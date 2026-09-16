@@ -12,16 +12,18 @@ enum Role {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  incomes   Income[]
-  expenses  Expense[]
-  
+  id         String    @id @default(uuid())
+  email      String    @unique
+  password   String?
+  name       String
+  role       Role      @default(USER)
+  googleId   String?   @unique
+  picture    String?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+  incomes    Income[]
+  expenses   Expense[]
+  emergencyFundMovements EmergencyFundMovement[]
   @@map("users")
 }
 enum IncomeType {
@@ -68,4 +70,25 @@ model Expense {
   createdAt    DateTime        @default(now())
 
   @@map("expenses")
+}
+enum FundMovementType {
+  APORTE
+  RETIRO
+  GASTO_DIRECTO
+}
+
+model EmergencyFundMovement {
+  id           String            @id @default(uuid())
+  userId       String
+  user         User              @relation(fields: [userId], references: [id])
+  movementType FundMovementType
+  sourceType   IncomeType?
+  grossAmount  Decimal           @db.Decimal(10, 2)
+  tax          Decimal           @default(0) @db.Decimal(10, 2)
+  netAmount    Decimal           @db.Decimal(10, 2)
+  description  String?
+  date         DateTime          @default(now())
+  createdAt    DateTime          @default(now())
+
+  @@map("emergency_fund_movements")
 }

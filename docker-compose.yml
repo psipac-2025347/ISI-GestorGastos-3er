@@ -5,10 +5,12 @@ services:
     ports:
       - "3010:3000"
     environment:
-      - DATABASE_URL=postgresql://postgres:admin@host.docker.internal:5432/control_gastos?schema=public
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD}@host.docker.internal:5432/control_gastos?schema=public
       - JWT_SECRET=cambia_este_valor_por_uno_seguro
-      - JWT_EXPIRES_IN=1d
+      - JWT_EXPIRES_IN=2m
       - PORT=3000
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
