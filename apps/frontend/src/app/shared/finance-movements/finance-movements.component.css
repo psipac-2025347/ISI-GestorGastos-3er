@@ -157,9 +157,9 @@
   background-position: center;
   justify-self: start;
 }
-.movement-item:nth-child(3n+1)::before { background-image: url("/images/icons/sueldo-fijo.png"); }
-.movement-item:nth-child(3n+2)::before { background-image: url("/images/icons/Ingreso-Variable.png"); }
-.movement-item:nth-child(3n+3)::before { background-image: url("/images/icons/sueldo-extra.png"); }
+.movement-item.mod-fijo::before { background-image: url("/images/icons/sueldo-fijo.png"); }
+.movement-item.mod-variable::before { background-image: url("/images/icons/Ingreso-Variable.png"); }
+.movement-item.mod-extra::before { background-image: url("/images/icons/sueldo-extra.png"); }
 .movement-icon {
   width: 22px;
   height: 22px;
@@ -238,4 +238,25 @@
 .modal-list {
   max-height: 50vh;
   overflow-y: auto;
+}
+
+.detail-modal {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem 2rem;
+  max-width: 380px;
+  width: 100%;
+}
+
+.detail-modal p {
+  margin: 0.5rem 0;
+  color: #2B2B2B;
+}
+
+.movement-item {
+  cursor: pointer;
+}
+
+.movement-item:hover {
+  background-color: #f5f5f5;
 }

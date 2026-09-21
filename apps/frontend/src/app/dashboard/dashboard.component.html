@@ -3,7 +3,7 @@
   [sueldoVariable]="sueldoVariable()"
   [ingresosExtra]="ingresosExtra()"
 ></app-finance-summary>
-<app-finance-movements [movimientos]="movimientos()"></app-finance-movements>
+<app-finance-movements [movimientos]="movimientos()" (created)="reload()"></app-finance-movements>
 <footer class="dashboard-footer">
   <span>&copy; 2026 ISI. Todos los derechos reservados.</span>
   <span class="footer-links"><a href="#">Terminos</a> - <a href="#">Privacidad</a></span>

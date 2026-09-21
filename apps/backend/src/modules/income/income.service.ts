@@ -21,16 +21,20 @@ export class IncomeService {
     });
   }
 
-  async getSummary(userId: string) {
-    const incomes = await prisma.income.findMany({ where: { userId } });
+async getSummary(userId: string) {
+  const incomes = await prisma.income.findMany({ where: { userId } });
+  const expenses = await prisma.expense.findMany({ where: { userId } });
 
-    const summary = { FIJO: 0, VARIABLE: 0, EXTRA: 0 };
-    for (const income of incomes) {
-      summary[income.type] += Number(income.netAmount);
-    }
-
-    return summary;
+  const summary = { FIJO: 0, VARIABLE: 0, EXTRA: 0 };
+  for (const income of incomes) {
+    summary[income.type] += Number(income.netAmount);
   }
+  for (const expense of expenses) {
+    summary[expense.type] -= Number(expense.netAmount);
+  }
+
+  return summary;
+}
 
   async list(userId: string) {
     return prisma.income.findMany({

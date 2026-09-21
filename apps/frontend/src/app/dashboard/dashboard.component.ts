@@ -2,9 +2,15 @@ import { Component, OnInit, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { IncomeService, IncomeSummary } from '../core/services/income.service';
+import { ExpenseService } from '../core/services/expense.service';
 import { FinanceSummaryComponent } from '../shared/finance-summary/finance-summary.component';
 import { FinanceMovementsComponent } from '../shared/finance-movements/finance-movements.component';
-import { mapRecordsToMovimientos, Movimiento } from '../shared/movement.util';
+import {
+  mapIncomeRecordsToMovimientos,
+  mapExpenseRecordsToMovimientos,
+  combineMovimientos,
+  Movimiento,
+} from '../shared/movement.util';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,7 +25,11 @@ export class DashboardComponent implements OnInit {
   ingresosExtra = signal(0);
   movimientos = signal<Movimiento[]>([]);
 
-  constructor(private http: HttpClient, private incomeService: IncomeService) {}
+  constructor(
+    private http: HttpClient,
+    private incomeService: IncomeService,
+    private expenseService: ExpenseService
+  ) {}
 
   ngOnInit(): void {
     this.http.get(`${environment.apiUrl}/auth/me`).subscribe({ next: () => {} });
@@ -34,9 +44,16 @@ export class DashboardComponent implements OnInit {
         this.ingresosExtra.set(summary.EXTRA);
       },
     });
+
     this.incomeService.list().subscribe({
-      next: (records) => {
-        this.movimientos.set(mapRecordsToMovimientos(records));
+      next: (incomeRecords) => {
+        this.expenseService.list().subscribe({
+          next: (expenseRecords) => {
+            const income = mapIncomeRecordsToMovimientos(incomeRecords);
+            const expense = mapExpenseRecordsToMovimientos(expenseRecords);
+            this.movimientos.set(combineMovimientos(income, expense));
+          },
+        });
       },
     });
   }
